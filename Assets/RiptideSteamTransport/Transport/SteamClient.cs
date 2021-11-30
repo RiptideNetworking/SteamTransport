@@ -3,6 +3,7 @@
 // Copyright (c) 2021 Tom Weiland
 // For additional information please see the included LICENSE.md file or view it on GitHub: https://github.com/tom-weiland/RiptideSteamTransport/blob/main/LICENSE.md
 
+using RiptideNetworking.Transports.Utils;
 using Steamworks;
 using System;
 using System.Collections.Generic;
@@ -38,21 +39,21 @@ namespace RiptideNetworking.Transports.SteamTransport
         public bool IsConnecting => connectionState == ConnectionState.connecting;
         /// <inheritdoc/>
         public bool IsConnected => connectionState == ConnectionState.connected;
-        /// <summary>The time (in milliseconds) after which to disconnect if there's no heartbeat from the server.</summary>
-        public ushort TimeoutTime { get; set; } = 5000; // TODO: make Steam's sockets time out after this time (assuming such functionality exists)
+        /// <summary>The time (in milliseconds) after which to give up on a connection attempt.</summary>
+        public ushort TimeoutTime { get; set; } = 5000;
 
         private Callback<SteamNetConnectionStatusChangedCallback_t> connectionStatusChanged = null;
         private CSteamID hostSteamId = CSteamID.Nil;
         private HSteamNetConnection hostConnection;
-        private List<Action> bufferedData;
         private ConnectionState connectionState;
         private SteamServer localServer;
+        private ActionQueue actionQueue;
 
         public SteamClient(SteamServer localServer = null, ushort timeoutTime = 5000, string logName = "Steam Client") : base(logName)
         {
             this.localServer = localServer;
             TimeoutTime = timeoutTime;
-            bufferedData = new List<Action>();
+            actionQueue = new ActionQueue();
         }
 
         public void ChangeLocalServer(SteamServer newLocalServer)
@@ -174,12 +175,7 @@ namespace RiptideNetworking.Transports.SteamTransport
         {
             connectionState = ConnectionState.connected;
 
-            if (bufferedData.Count > 0)
-            {
-                RiptideLogger.Log(LogName, $"{bufferedData.Count} received before connection was established. Processing now.");
-                foreach (Action a in bufferedData)
-                    a();
-            }
+            actionQueue.ExecuteAll();
         }
 
         /// <inheritdoc/>
@@ -203,7 +199,7 @@ namespace RiptideNetworking.Transports.SteamTransport
                     else
                     {
                         Debug.Log("Ok this actually happens");
-                        bufferedData.Add(() => Handle(message, messageHeader));
+                        actionQueue.Add(() => Handle(message, messageHeader));
                     }
                 }
             }
@@ -242,12 +238,7 @@ namespace RiptideNetworking.Transports.SteamTransport
         /// <inheritdoc/>
         public void Send(Message message, bool shouldRelease = true)
         {
-            EResult res = SteamSend(message, hostConnection);
-
-            if (res == EResult.k_EResultNoConnection || res == EResult.k_EResultInvalidParam)
-                OnDisconnected();
-            else if (res != EResult.k_EResultOK)
-                RiptideLogger.Log(LogName, $"Failed to send message: {res}");
+            SteamSend(message, hostConnection);
 
             if (shouldRelease)
                 message.Release();

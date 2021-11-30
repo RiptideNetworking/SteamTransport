@@ -137,6 +137,7 @@ namespace RiptideNetworking.Transports.SteamTransport
             {
                 IntPtr[] ptrs = new IntPtr[MaxMessages]; // TODO: remove allocation?
 
+                // TODO: consider using poll groups -> https://partner.steamgames.com/doc/api/ISteamNetworkingSockets#functions_poll_groups
                 int messageCount = SteamNetworkingSockets.ReceiveMessagesOnConnection(client.SteamNetConnection, ptrs, MaxMessages);
                 if (messageCount > 0)
                 {
@@ -181,12 +182,7 @@ namespace RiptideNetworking.Transports.SteamTransport
 
         internal void Send(Message message, SteamConnection client, bool shouldRelease = true)
         {
-            EResult res = SteamSend(message, client.SteamNetConnection);
-
-            if (res == EResult.k_EResultNoConnection || res == EResult.k_EResultInvalidParam)
-                LocalDisconnect(client, "Disconnected"); // TODO: LocalDisconnect removes the client from the dictionary, which is a problem if this was called from within a foreach loop, like in SendToAll
-            else if (res != EResult.k_EResultOK)
-                RiptideLogger.Log(LogName, $"Failed to send message: {res}");
+            SteamSend(message, client.SteamNetConnection);
 
             if (shouldRelease)
                 message.Release();
