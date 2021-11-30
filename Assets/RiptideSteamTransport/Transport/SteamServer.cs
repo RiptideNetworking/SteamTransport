@@ -247,9 +247,7 @@ namespace RiptideNetworking.Transports.SteamTransport
             }
 
             foreach (SteamConnection client in clients.Values)
-            {
-                // TODO: disconnect clients
-            }
+                SteamNetworkingSockets.CloseConnection(client.SteamNetConnection, 0, "Server stopped.", false);
             clients.Clear();
 
             SteamNetworkingSockets.CloseListenSocket(listenSocket);
