@@ -30,7 +30,7 @@ namespace RiptideNetworking.Transports.SteamTransport
 
             GCHandle pinnedArray = GCHandle.Alloc(data, GCHandleType.Pinned);
             IntPtr pData = pinnedArray.AddrOfPinnedObject();
-            int sendFlag = message.SendMode == MessageSendMode.reliable ? Constants.k_nSteamNetworkingSend_Unreliable : Constants.k_nSteamNetworkingSend_Reliable;
+            int sendFlag = message.SendMode == MessageSendMode.reliable ? Constants.k_nSteamNetworkingSend_Reliable : Constants.k_nSteamNetworkingSend_Unreliable;
             EResult res = SteamNetworkingSockets.SendMessageToConnection(connection, pData, (uint)data.Length, sendFlag, out long _);
             if (res != EResult.k_EResultOK)
                 RiptideLogger.Log(LogName, $"Failed to send message: {res}");

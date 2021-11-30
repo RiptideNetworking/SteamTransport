@@ -69,6 +69,7 @@ namespace RiptideNetworking.Demos.SteamTransport.PlayerHosted
             UIManager.Singleton.LobbyCreationSucceeded(callback.m_ulSteamIDLobby);
 
             NetworkManager.Singleton.Server.Start(0, 5);
+            NetworkManager.Singleton.Client.Connect("127.0.0.1");
         }
 
         internal void JoinLobby(ulong lobbyId)

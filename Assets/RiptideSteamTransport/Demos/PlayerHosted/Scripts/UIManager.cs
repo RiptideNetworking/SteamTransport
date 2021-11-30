@@ -83,6 +83,9 @@ namespace RiptideNetworking.Demos.SteamTransport.PlayerHosted
         {
             mainMenu.SetActive(true);
             lobbyMenu.SetActive(false);
+
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
         }
 
         internal void UpdateUIVisibility()

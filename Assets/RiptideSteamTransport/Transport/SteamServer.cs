@@ -184,7 +184,7 @@ namespace RiptideNetworking.Transports.SteamTransport
             EResult res = SteamSend(message, client.SteamNetConnection);
 
             if (res == EResult.k_EResultNoConnection || res == EResult.k_EResultInvalidParam)
-                LocalDisconnect(client, "Disconnected");
+                LocalDisconnect(client, "Disconnected"); // TODO: LocalDisconnect removes the client from the dictionary, which is a problem if this was called from within a foreach loop, like in SendToAll
             else if (res != EResult.k_EResultOK)
                 RiptideLogger.Log(LogName, $"Failed to send message: {res}");
 
@@ -336,7 +336,6 @@ namespace RiptideNetworking.Transports.SteamTransport
         /// <param name="e">The event args to invoke the event with.</param>
         private void OnMessageReceived(ServerMessageReceivedEventArgs e)
         {
-            Debug.Log($"Received message with ID {e.MessageId} from client {e.FromClientId}");
             MessageReceived?.Invoke(this, e);
         }
 

@@ -132,9 +132,9 @@ namespace RiptideNetworking.Transports.SteamTransport
 
             SteamNetworkingIdentity clientIdentity = new SteamNetworkingIdentity();
             SteamNetworkingIdentity serverIdentity = new SteamNetworkingIdentity();
-            //clientIdentity.SetSteamID(hostSteamId);
-            //serverIdentity.SetSteamID(hostSteamId);
-            
+            clientIdentity.SetSteamID(hostSteamId);
+            serverIdentity.SetSteamID(hostSteamId);
+
             SteamNetworkingSockets.CreateSocketPair(out HSteamNetConnection connectionToClient, out HSteamNetConnection connectionToServer, false, ref clientIdentity, ref serverIdentity);
             hostConnection = connectionToServer;
 
@@ -144,6 +144,16 @@ namespace RiptideNetworking.Transports.SteamTransport
 
         private void OnConnectionStatusChanged(SteamNetConnectionStatusChangedCallback_t callback)
         {
+            if (!callback.m_hConn.Equals(hostConnection))
+            {
+                // When connecting via local loopback connection to a locally running SteamServer (aka
+                // this player is also the host), other external clients that attempt to connect seem
+                // to trigger ConnectionStatusChanged callbacks for the locally connected client. Not
+                // 100% sure why this is the case, but returning out of the callback here when the
+                // connection doesn't match that between local client & server avoids the problem.
+                return;
+            }
+
             switch (callback.m_info.m_eState)
             {
                 case ESteamNetworkingConnectionState.k_ESteamNetworkingConnectionState_Connected:
@@ -165,7 +175,6 @@ namespace RiptideNetworking.Transports.SteamTransport
         private void ConnectionStatusChangedToConnected()
         {
             connectionState = ConnectionState.connected;
-            OnConnected();
 
             if (bufferedData.Count > 0)
             {
@@ -281,6 +290,7 @@ namespace RiptideNetworking.Transports.SteamTransport
             Id = message.GetUShort();
 
             SendWelcomeReceived();
+            OnConnected();
         }
 
         /// <summary>Sends a welcome (received) message.</summary>
@@ -331,7 +341,6 @@ namespace RiptideNetworking.Transports.SteamTransport
         /// <param name="e">The event args to invoke the event with.</param>
         private void OnMessageReceived(ClientMessageReceivedEventArgs e)
         {
-            Debug.Log($"Received message with ID {e.MessageId}");
             MessageReceived?.Invoke(this, e);
         }
 
