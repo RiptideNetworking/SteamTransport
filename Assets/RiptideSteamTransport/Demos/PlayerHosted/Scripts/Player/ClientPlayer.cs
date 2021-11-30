@@ -34,7 +34,10 @@ namespace RiptideNetworking.Demos.SteamTransport.PlayerHosted
             if (id == NetworkManager.Singleton.Client.Id)
                 player = Instantiate(NetworkManager.Singleton.LocalPlayerPrefab, position, Quaternion.identity).GetComponent<ClientPlayer>();
             else
+            {
                 player = Instantiate(NetworkManager.Singleton.PlayerPrefab, position, Quaternion.identity).GetComponent<ClientPlayer>();
+                player.GetComponentInChildren<PlayerUIManager>().SetName(username);
+            }
 
             player.name = $"Client Player {id} ({username})";
             player.id = id;

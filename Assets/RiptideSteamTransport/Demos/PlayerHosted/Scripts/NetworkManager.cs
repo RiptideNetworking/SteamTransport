@@ -6,7 +6,6 @@
 using RiptideNetworking.Transports.SteamTransport;
 using System;
 using UnityEngine;
-using SteamClient = RiptideNetworking.Transports.SteamTransport.SteamClient;
 
 namespace RiptideNetworking.Demos.SteamTransport.PlayerHosted
 {
@@ -133,7 +132,9 @@ namespace RiptideNetworking.Demos.SteamTransport.PlayerHosted
 
         private void DidConnect(object sender, EventArgs e)
         {
-            UIManager.Singleton.SendName();
+            Message message = Message.Create(MessageSendMode.reliable, (ushort)ClientToServerId.playerName);
+            message.Add(Steamworks.SteamFriends.GetPersonaName());
+            Client.Send(message);
         }
 
         private void FailedToConnect(object sender, EventArgs e)

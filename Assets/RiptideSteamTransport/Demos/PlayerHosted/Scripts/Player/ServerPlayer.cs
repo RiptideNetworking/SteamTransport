@@ -70,7 +70,7 @@ namespace RiptideNetworking.Demos.SteamTransport.PlayerHosted
         [MessageHandler((ushort)ClientToServerId.playerName)]
         private static void PlayerName(ushort fromClientId, Message message)
         {
-            Spawn(fromClientId, /* TODO: message.GetString() */ "");
+            Spawn(fromClientId, message.GetString());
         }
 
         [MessageHandler((ushort)ClientToServerId.playerInput)]

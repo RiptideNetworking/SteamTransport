@@ -95,14 +95,5 @@ namespace RiptideNetworking.Demos.SteamTransport.PlayerHosted
             else
                 lobbyMenu.SetActive(false);
         }
-
-        #region Messages
-        public void SendName()
-        {
-            Message message = Message.Create(MessageSendMode.reliable, (ushort)ClientToServerId.playerName);
-            // TODO: message.Add(usernameField.text);
-            NetworkManager.Singleton.Client.Send(message);
-        }
-        #endregion
     }
 }
