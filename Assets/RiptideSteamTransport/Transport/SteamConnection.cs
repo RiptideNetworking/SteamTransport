@@ -58,16 +58,9 @@ namespace RiptideNetworking.Transports.SteamTransport
         /// <param name="message">The welcome message to handle.</param>
         internal void HandleWelcomeReceived(Message message)
         {
-            if (IsConnected)
-                return;
-
             ushort id = message.GetUShort();
             if (Id != id)
                 RiptideLogger.Log(server.LogName, $"Client has assumed ID {id} instead of {Id}!");
-
-            // TODO: happens elsewhere so remove?
-            //connectionState = ConnectionState.connected;
-            //server.OnClientConnected(SteamId, new ServerClientConnectedEventArgs(this));
         }
         #endregion
     }

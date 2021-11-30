@@ -64,8 +64,6 @@ namespace RiptideNetworking.Transports.SteamTransport
         /// <remarks>Expects the host address to consist of a Steam ID (<see cref="ulong"/>).</remarks>
         public void Connect(string hostAddress)
         {
-            // TODO: add loopback connection option so hosts can "connect" to themselves - https://partner.steamgames.com/doc/api/ISteamNetworkingSockets#CreateSocketPair
-            
             try
             {
 #if UNITY_SERVER
