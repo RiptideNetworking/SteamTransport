@@ -47,13 +47,16 @@ namespace RiptideNetworking.Transports.SteamTransport
             if (data.m_cbSize > message.Bytes.Length)
             {
                 RiptideLogger.Log(LogName, $"Can't fully handle {data.m_cbSize} bytes because it exceeds the maximum of {message.Bytes.Length}, message will contain incomplete data!");
-                Marshal.Copy(data.m_pData, message.Bytes, 0, data.m_cbSize);
+                Marshal.Copy(data.m_pData, message.Bytes, 0, message.Bytes.Length);
+                messageHeader = message.PrepareForUse((ushort)message.Bytes.Length);
             }
             else
+            {
                 Marshal.Copy(data.m_pData, message.Bytes, 0, data.m_cbSize);
+                messageHeader = message.PrepareForUse((ushort)data.m_cbSize);
+            }
 
             SteamNetworkingMessage_t.Release(ptrs);
-            messageHeader = message.PrepareForUse((ushort)data.m_cbSize);
             return message;
         }
     }
