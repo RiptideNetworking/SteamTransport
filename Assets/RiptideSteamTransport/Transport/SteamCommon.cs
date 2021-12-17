@@ -3,6 +3,7 @@
 // Copyright (c) 2021 Tom Weiland
 // For additional information please see the included LICENSE.md file or view it on GitHub: https://github.com/tom-weiland/RiptideSteamTransport/blob/main/LICENSE.md
 
+using RiptideNetworking.Utils;
 using Steamworks;
 using System;
 using System.Runtime.InteropServices;
@@ -33,7 +34,7 @@ namespace RiptideNetworking.Transports.SteamTransport
             int sendFlag = message.SendMode == MessageSendMode.reliable ? Constants.k_nSteamNetworkingSend_Reliable : Constants.k_nSteamNetworkingSend_Unreliable;
             EResult res = SteamNetworkingSockets.SendMessageToConnection(connection, pData, (uint)data.Length, sendFlag, out long _);
             if (res != EResult.k_EResultOK)
-                RiptideLogger.Log(LogName, $"Failed to send message: {res}");
+                RiptideLogger.Log(LogType.warning, LogName, $"Failed to send message: {res}");
 
             pinnedArray.Free();
             return res;
@@ -46,7 +47,7 @@ namespace RiptideNetworking.Transports.SteamTransport
             Message message = Message.Create();
             if (data.m_cbSize > message.Bytes.Length)
             {
-                RiptideLogger.Log(LogName, $"Can't fully handle {data.m_cbSize} bytes because it exceeds the maximum of {message.Bytes.Length}, message will contain incomplete data!");
+                RiptideLogger.Log(LogType.warning, LogName, $"Can't fully handle {data.m_cbSize} bytes because it exceeds the maximum of {message.Bytes.Length}, message will contain incomplete data!");
                 Marshal.Copy(data.m_pData, message.Bytes, 0, message.Bytes.Length);
                 messageHeader = message.PrepareForUse((ushort)message.Bytes.Length);
             }

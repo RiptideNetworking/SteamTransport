@@ -3,12 +3,12 @@
 // Copyright (c) 2021 Tom Weiland
 // For additional information please see the included LICENSE.md file or view it on GitHub: https://github.com/tom-weiland/RiptideSteamTransport/blob/main/LICENSE.md
 
-using RiptideNetworking.Transports.Utils;
+using RiptideNetworking.Utils;
 using Steamworks;
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
+using LogType = RiptideNetworking.Utils.LogType;
 
 namespace RiptideNetworking.Transports.SteamTransport
 {
@@ -91,8 +91,7 @@ namespace RiptideNetworking.Transports.SteamTransport
         {
             try
             {
-                if (ShouldOutputInfoLogs)
-                    RiptideLogger.Log(LogName, $"Connecting to {hostId}...");
+                RiptideLogger.Log(LogType.info, LogName, $"Connecting to {hostId}...");
 
                 connectionStatusChanged = Callback<SteamNetConnectionStatusChangedCallback_t>.Create(OnConnectionStatusChanged);
                 hostSteamId = new CSteamID(hostId);
@@ -123,8 +122,7 @@ namespace RiptideNetworking.Transports.SteamTransport
                 return;
             }
 
-            if (ShouldOutputInfoLogs)
-                RiptideLogger.Log(LogName, $"Connecting to local server...");
+            RiptideLogger.Log(LogType.info, LogName, $"Connecting to local server...");
 
             connectionStatusChanged = Callback<SteamNetConnectionStatusChangedCallback_t>.Create(OnConnectionStatusChanged);
             hostSteamId = SteamUser.GetSteamID();
@@ -161,12 +159,12 @@ namespace RiptideNetworking.Transports.SteamTransport
 
                 case ESteamNetworkingConnectionState.k_ESteamNetworkingConnectionState_ClosedByPeer:
                 case ESteamNetworkingConnectionState.k_ESteamNetworkingConnectionState_ProblemDetectedLocally:
-                    RiptideLogger.Log(LogName, $"Connection was closed by peer: {callback.m_info.m_szEndDebug}");
+                    RiptideLogger.Log(LogType.info, LogName, $"Connection was closed by peer: {callback.m_info.m_szEndDebug}");
                     OnDisconnected();
                     break;
 
                 default:
-                    RiptideLogger.Log(LogName, $"Connection state changed: {callback.m_info.m_eState} - {callback.m_info.m_szEndDebug}");
+                    RiptideLogger.Log(LogType.info, LogName, $"Connection state changed: {callback.m_info.m_eState} - {callback.m_info.m_szEndDebug}");
                     break;
             }
         }
@@ -251,7 +249,7 @@ namespace RiptideNetworking.Transports.SteamTransport
                 return;
 
             LocalDisconnect();
-            RiptideLogger.Log(LogName, "Disconnected.");
+            RiptideLogger.Log(LogType.info, LogName, "Disconnected.");
         }
 
         private void LocalDisconnect()
@@ -310,17 +308,14 @@ namespace RiptideNetworking.Transports.SteamTransport
         /// <summary>Invokes the <see cref="Connected"/> event.</summary>
         private void OnConnected()
         {
-            if (ShouldOutputInfoLogs)
-                RiptideLogger.Log(LogName, "Connected successfully!");
-            
+            RiptideLogger.Log(LogType.info, LogName, "Connected successfully!");
             Connected?.Invoke(this, EventArgs.Empty);
         }
 
         /// <summary>Invokes the <see cref="ConnectionFailed"/> event.</summary>
         private void OnConnectionFailed(string reason)
         {
-            if (ShouldOutputInfoLogs)
-                RiptideLogger.Log(LogName, $"Connection to server failed: {reason}");
+            RiptideLogger.Log(LogType.info, LogName, $"Connection to server failed: {reason}");
 
             LocalDisconnect();
             ConnectionFailed?.Invoke(this, EventArgs.Empty);
@@ -336,8 +331,7 @@ namespace RiptideNetworking.Transports.SteamTransport
         /// <summary>Invokes the <see cref="Disconnected"/> event.</summary>
         private void OnDisconnected()
         {
-            if (ShouldOutputInfoLogs)
-                RiptideLogger.Log(LogName, "Disconnected from server (initiated remotely).");
+            RiptideLogger.Log(LogType.info, LogName, "Disconnected from server (initiated remotely).");
 
             LocalDisconnect();
             Disconnected?.Invoke(this, EventArgs.Empty);
@@ -347,9 +341,7 @@ namespace RiptideNetworking.Transports.SteamTransport
         /// <param name="e">The event args to invoke the event with.</param>
         private void OnClientConnected(ClientConnectedEventArgs e)
         {
-            if (ShouldOutputInfoLogs)
-                RiptideLogger.Log(LogName, $"Client {e.Id} connected.");
-            
+            RiptideLogger.Log(LogType.info, LogName, $"Client {e.Id} connected.");
             ClientConnected?.Invoke(this, e);
         }
 
@@ -357,9 +349,7 @@ namespace RiptideNetworking.Transports.SteamTransport
         /// <param name="e">The event args to invoke the event with.</param>
         private void OnClientDisconnected(ClientDisconnectedEventArgs e)
         {
-            if (ShouldOutputInfoLogs)
-                RiptideLogger.Log(LogName, $"Client {e.Id} disconnected.");
-            
+            RiptideLogger.Log(LogType.info, LogName, $"Client {e.Id} disconnected.");
             ClientDisconnected?.Invoke(this, e);
         }
         #endregion

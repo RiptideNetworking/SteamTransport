@@ -4,6 +4,7 @@
 // For additional information please see the included LICENSE.md file or view it on GitHub: https://github.com/tom-weiland/RiptideSteamTransport/blob/main/LICENSE.md
 
 using RiptideNetworking.Transports.SteamTransport;
+using RiptideNetworking.Utils;
 using System;
 using UnityEngine;
 
@@ -63,7 +64,7 @@ namespace RiptideNetworking.Demos.SteamTransport.PlayerHosted
             }
 
 #if UNITY_EDITOR
-            RiptideLogger.Initialize(Debug.Log, false);
+            RiptideLogger.Initialize(Debug.Log, Debug.Log, Debug.LogWarning, Debug.LogError, false);
 #else
             RiptideLogger.Initialize(Debug.Log, true);
 #endif

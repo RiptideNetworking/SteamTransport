@@ -3,12 +3,13 @@
 // Copyright (c) 2021 Tom Weiland
 // For additional information please see the included LICENSE.md file or view it on GitHub: https://github.com/tom-weiland/RiptideSteamTransport/blob/main/LICENSE.md
 
-using RiptideNetworking.Transports.Utils;
+using RiptideNetworking.Utils;
 using Steamworks;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using LogType = RiptideNetworking.Utils.LogType;
 
 namespace RiptideNetworking.Transports.SteamTransport
 {
@@ -71,8 +72,7 @@ namespace RiptideNetworking.Transports.SteamTransport
             SteamNetworkingConfigValue_t[] options = new SteamNetworkingConfigValue_t[] { };
             listenSocket = SteamNetworkingSockets.CreateListenSocketP2P(port, options.Length, options);
 
-            if (ShouldOutputInfoLogs)
-                RiptideLogger.Log(LogName, port == 0 ? "Started server." : $"Started on virtual port {port}");
+            RiptideLogger.Log(LogType.info, LogName, port == 0 ? "Started server." : $"Started on virtual port {port}");
         }
 
         private void OnConnectionStatusChanged(SteamNetConnectionStatusChangedCallback_t callback)
@@ -85,18 +85,13 @@ namespace RiptideNetworking.Transports.SteamTransport
                     {
                         EResult result = SteamNetworkingSockets.AcceptConnection(callback.m_hConn);
                         if (result == EResult.k_EResultOK)
-                        {
-                            if (ShouldOutputInfoLogs)
-                                RiptideLogger.Log(LogName, $"Accepting connection from {clientSteamID}...");
-                        }
+                            RiptideLogger.Log(LogType.info, LogName, $"Accepting connection from {clientSteamID}...");
                         else
-                            RiptideLogger.Log(LogName, $"Connection from {clientSteamID} could not be accepted: {result}");
+                            RiptideLogger.Log(LogType.warning, LogName, $"Connection from {clientSteamID} could not be accepted: {result}");
                     }
                     else
                     {
-                        if (ShouldOutputInfoLogs)
-                            RiptideLogger.Log(LogName, $"Server is full! Rejecting connection from {clientSteamID}.");
-
+                        RiptideLogger.Log(LogType.info, LogName, $"Server is full! Rejecting connection from {clientSteamID}.");
                         SteamNetworkingSockets.CloseConnection(callback.m_hConn, 0, "Server full", false);
                     }
                     break;
@@ -112,7 +107,7 @@ namespace RiptideNetworking.Transports.SteamTransport
                     break;
 
                 default:
-                    RiptideLogger.Log(LogName, $"{clientSteamID}'s connection state changed: {callback.m_info.m_eState}");
+                    RiptideLogger.Log(LogType.info, LogName, $"{clientSteamID}'s connection state changed: {callback.m_info.m_eState}");
                     break;
             }
         }
@@ -214,14 +209,13 @@ namespace RiptideNetworking.Transports.SteamTransport
         {
             if (clients.TryGetValue(clientId, out SteamConnection client))
             {
-                if (ShouldOutputInfoLogs)
-                    RiptideLogger.Log(LogName, $"Kicked {client.SteamId} (ID: {client.Id}).");
+                RiptideLogger.Log(LogType.info, LogName, $"Kicked {client.SteamId} (ID: {client.Id}).");
 
                 LocalDisconnect(client, "Kicked by server");
                 availableClientIds.Add(client.Id);
             }
             else
-                RiptideLogger.Log(LogName, $"Failed to kick {client.SteamId} because they weren't connected!");
+                RiptideLogger.Log(LogType.warning, LogName, $"Failed to kick {client.SteamId} because they weren't connected!");
         }
 
         private void LocalDisconnect(SteamConnection client, string reason)
@@ -247,9 +241,7 @@ namespace RiptideNetworking.Transports.SteamTransport
             clients.Clear();
 
             SteamNetworkingSockets.CloseListenSocket(listenSocket);
-
-            if (ShouldOutputInfoLogs)
-                RiptideLogger.Log(LogName, "Server stopped.");
+            RiptideLogger.Log(LogType.info, LogName, "Server stopped.");
         }
 
         /// <summary>Initializes available client IDs.</summary>
@@ -272,7 +264,7 @@ namespace RiptideNetworking.Transports.SteamTransport
             }
             else
             {
-                RiptideLogger.Log(LogName, "No available client IDs, assigned 0!");
+                RiptideLogger.Log(LogType.error, LogName, "No available client IDs, assigned 0!");
                 return 0;
             }
         }
@@ -318,11 +310,9 @@ namespace RiptideNetworking.Transports.SteamTransport
         /// <param name="e">The event args to invoke the event with.</param>
         internal void OnClientConnected(CSteamID clientSteamId, ServerClientConnectedEventArgs e)
         {
-            if (ShouldOutputInfoLogs)
-                RiptideLogger.Log(LogName, $"{clientSteamId} connected successfully! Client ID: {e.Client.Id}");
+            RiptideLogger.Log(LogType.info, LogName, $"{clientSteamId} connected successfully! Client ID: {e.Client.Id}");
 
             ClientConnected?.Invoke(this, e);
-
             SendClientConnected(clientSteamId, e.Client.Id);
         }
 
@@ -337,11 +327,9 @@ namespace RiptideNetworking.Transports.SteamTransport
         /// <param name="e">The event args to invoke the event with.</param>
         private void OnClientDisconnected(ulong steamId, ClientDisconnectedEventArgs e)
         {
-            if (ShouldOutputInfoLogs)
-                RiptideLogger.Log(LogName, $"Client {e.Id} (Steam ID: {steamId}) has disconnected.");
+            RiptideLogger.Log(LogType.info, LogName, $"Client {e.Id} (Steam ID: {steamId}) has disconnected.");
 
             ClientDisconnected?.Invoke(this, e);
-
             SendClientDisconnected(e.Id);
         }
         #endregion
