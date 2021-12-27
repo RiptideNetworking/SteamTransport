@@ -23,6 +23,8 @@ namespace RiptideNetworking.Demos.SteamTransport.PlayerHosted
 
     public class NetworkManager : MonoBehaviour
     {
+        public const byte PlayerHostedDemoMessageHandlerGroupId = 255;
+
         private static NetworkManager _singleton;
         internal static NetworkManager Singleton
         {

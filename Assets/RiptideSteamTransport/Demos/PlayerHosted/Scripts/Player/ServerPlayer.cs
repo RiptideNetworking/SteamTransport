@@ -67,13 +67,13 @@ namespace RiptideNetworking.Demos.SteamTransport.PlayerHosted
             return message;
         }
 
-        [MessageHandler((ushort)ClientToServerId.playerName)]
+        [MessageHandler((ushort)ClientToServerId.playerName, NetworkManager.PlayerHostedDemoMessageHandlerGroupId)]
         private static void PlayerName(ushort fromClientId, Message message)
         {
             Spawn(fromClientId, message.GetString());
         }
 
-        [MessageHandler((ushort)ClientToServerId.playerInput)]
+        [MessageHandler((ushort)ClientToServerId.playerInput, NetworkManager.PlayerHostedDemoMessageHandlerGroupId)]
         private static void PlayerInput(ushort fromClientId, Message message)
         {
             ServerPlayer player = List[fromClientId];

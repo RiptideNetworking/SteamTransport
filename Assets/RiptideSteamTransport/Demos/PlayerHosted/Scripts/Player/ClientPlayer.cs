@@ -46,13 +46,13 @@ namespace RiptideNetworking.Demos.SteamTransport.PlayerHosted
         }
 
         #region Messages
-        [MessageHandler((ushort)ServerToClientId.spawnPlayer)]
+        [MessageHandler((ushort)ServerToClientId.spawnPlayer, NetworkManager.PlayerHostedDemoMessageHandlerGroupId)]
         private static void SpawnPlayer(Message message)
         {
             Spawn(message.GetUShort(), message.GetString(), message.GetVector3());
         }
 
-        [MessageHandler((ushort)ServerToClientId.playerMovement)]
+        [MessageHandler((ushort)ServerToClientId.playerMovement, NetworkManager.PlayerHostedDemoMessageHandlerGroupId)]
         private static void PlayerMovement(Message message)
         {
             ushort playerId = message.GetUShort();
