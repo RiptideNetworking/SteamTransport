@@ -5,7 +5,7 @@
 
 using UnityEngine;
 
-namespace RiptideNetworking.Demos.SteamTransport.PlayerHosted
+namespace RiptideDemos.SteamTransport.PlayerHosted
 {
     public class CameraController : MonoBehaviour
     {

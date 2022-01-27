@@ -49,7 +49,7 @@ namespace RiptideNetworking.Transports.SteamTransport
         /// <summary>Sends a welcome message.</summary>
         internal void SendWelcome()
         {
-            Message message = Message.Create(HeaderType.welcome);
+            Message message = MessageExtensionsTransports.Create(HeaderType.welcome);
             message.Add(Id);
 
             server.Send(message, this);

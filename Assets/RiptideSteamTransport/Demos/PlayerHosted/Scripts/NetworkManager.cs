@@ -3,12 +3,13 @@
 // Copyright (c) 2021 Tom Weiland
 // For additional information please see the included LICENSE.md file or view it on GitHub: https://github.com/tom-weiland/RiptideSteamTransport/blob/main/LICENSE.md
 
+using RiptideNetworking;
 using RiptideNetworking.Transports.SteamTransport;
 using RiptideNetworking.Utils;
 using System;
 using UnityEngine;
 
-namespace RiptideNetworking.Demos.SteamTransport.PlayerHosted
+namespace RiptideDemos.SteamTransport.PlayerHosted
 {
     public enum ServerToClientId : ushort
     {
@@ -88,8 +89,7 @@ namespace RiptideNetworking.Demos.SteamTransport.PlayerHosted
             if (Server.IsRunning)
                 Server.Tick();
 
-            if (Client.IsConnected)
-                Client.Tick();
+            Client.Tick();
         }
 
         private void OnApplicationQuit()
@@ -135,7 +135,7 @@ namespace RiptideNetworking.Demos.SteamTransport.PlayerHosted
 
         private void DidConnect(object sender, EventArgs e)
         {
-            Message message = Message.Create(MessageSendMode.reliable, (ushort)ClientToServerId.playerName);
+            Message message = Message.Create(MessageSendMode.reliable, ClientToServerId.playerName);
             message.Add(Steamworks.SteamFriends.GetPersonaName());
             Client.Send(message);
         }

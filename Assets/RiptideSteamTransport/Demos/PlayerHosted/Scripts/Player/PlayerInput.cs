@@ -3,9 +3,10 @@
 // Copyright (c) 2021 Tom Weiland
 // For additional information please see the included LICENSE.md file or view it on GitHub: https://github.com/tom-weiland/RiptideSteamTransport/blob/main/LICENSE.md
 
+using RiptideNetworking;
 using UnityEngine;
 
-namespace RiptideNetworking.Demos.SteamTransport.PlayerHosted
+namespace RiptideDemos.SteamTransport.PlayerHosted
 {
     public class PlayerInput : MonoBehaviour
     {
@@ -48,7 +49,7 @@ namespace RiptideNetworking.Demos.SteamTransport.PlayerHosted
         #region Messages
         private void SendInput()
         {
-            Message message = Message.Create(MessageSendMode.unreliable, (ushort)ClientToServerId.playerInput);
+            Message message = Message.Create(MessageSendMode.unreliable, ClientToServerId.playerInput);
             message.Add(inputs, false);
             message.Add(camTransform.forward);
             NetworkManager.Singleton.Client.Send(message);

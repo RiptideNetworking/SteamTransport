@@ -3,9 +3,10 @@
 // Copyright (c) 2021 Tom Weiland
 // For additional information please see the included LICENSE.md file or view it on GitHub: https://github.com/tom-weiland/RiptideSteamTransport/blob/main/LICENSE.md
 
+using RiptideNetworking;
 using UnityEngine;
 
-namespace RiptideNetworking.Demos.SteamTransport.PlayerHosted
+namespace RiptideDemos.SteamTransport.PlayerHosted
 {
     [RequireComponent(typeof(CharacterController))]
     public class PlayerMovement : MonoBehaviour
@@ -77,7 +78,7 @@ namespace RiptideNetworking.Demos.SteamTransport.PlayerHosted
         #region Messages
         private void SendMovement()
         {
-            Message message = Message.Create(MessageSendMode.unreliable, (ushort)ServerToClientId.playerMovement);
+            Message message = Message.Create(MessageSendMode.unreliable, ServerToClientId.playerMovement);
             message.Add(player.Id);
             message.Add(transform.position);
             message.Add(transform.forward);

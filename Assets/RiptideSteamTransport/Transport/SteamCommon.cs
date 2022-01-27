@@ -26,7 +26,7 @@ namespace RiptideNetworking.Transports.SteamTransport
 
         protected EResult SteamSend(Message message, HSteamNetConnection connection)
         {
-            byte[] data = new byte[message.WrittenLength]; // TODO: do something about this allocation?
+            byte[] data = new byte[message.WrittenLength]; // TODO: is this allocation even necessary?
             Array.Copy(message.Bytes, data, data.Length);
 
             GCHandle pinnedArray = GCHandle.Alloc(data, GCHandleType.Pinned);
@@ -44,17 +44,19 @@ namespace RiptideNetworking.Transports.SteamTransport
         {
             SteamNetworkingMessage_t data = Marshal.PtrToStructure<SteamNetworkingMessage_t>(ptrs);
             
-            Message message = Message.Create();
+            Message message = MessageExtensionsTransports.CreateRaw();
             if (data.m_cbSize > message.Bytes.Length)
             {
                 RiptideLogger.Log(LogType.warning, LogName, $"Can't fully handle {data.m_cbSize} bytes because it exceeds the maximum of {message.Bytes.Length}, message will contain incomplete data!");
                 Marshal.Copy(data.m_pData, message.Bytes, 0, message.Bytes.Length);
-                messageHeader = message.PrepareForUse((ushort)message.Bytes.Length);
+                messageHeader = (HeaderType)message.Bytes[0];
+                message.PrepareForUse(messageHeader, (ushort)message.Bytes.Length);
             }
             else
             {
                 Marshal.Copy(data.m_pData, message.Bytes, 0, data.m_cbSize);
-                messageHeader = message.PrepareForUse((ushort)data.m_cbSize);
+                messageHeader = (HeaderType)message.Bytes[0];
+                message.PrepareForUse(messageHeader, (ushort)message.Bytes.Length);
             }
 
             SteamNetworkingMessage_t.Release(ptrs);

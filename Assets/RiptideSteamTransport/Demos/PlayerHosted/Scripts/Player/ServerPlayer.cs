@@ -3,10 +3,11 @@
 // Copyright (c) 2021 Tom Weiland
 // For additional information please see the included LICENSE.md file or view it on GitHub: https://github.com/tom-weiland/RiptideSteamTransport/blob/main/LICENSE.md
 
+using RiptideNetworking;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace RiptideNetworking.Demos.SteamTransport.PlayerHosted
+namespace RiptideDemos.SteamTransport.PlayerHosted
 {
     [RequireComponent(typeof(PlayerMovement))]
     public class ServerPlayer : MonoBehaviour
@@ -51,12 +52,12 @@ namespace RiptideNetworking.Demos.SteamTransport.PlayerHosted
         /// <param name="toClient">The client to send the message to.</param>
         public void SendSpawn(ushort toClient)
         {
-            NetworkManager.Singleton.Server.Send(GetSpawnData(Message.Create(MessageSendMode.reliable, (ushort)ServerToClientId.spawnPlayer)), toClient);
+            NetworkManager.Singleton.Server.Send(GetSpawnData(Message.Create(MessageSendMode.reliable, ServerToClientId.spawnPlayer)), toClient);
         }
         /// <summary>Sends a player's info to all clients.</summary>
         private void SendSpawn()
         {
-            NetworkManager.Singleton.Server.SendToAll(GetSpawnData(Message.Create(MessageSendMode.reliable, (ushort)ServerToClientId.spawnPlayer)));
+            NetworkManager.Singleton.Server.SendToAll(GetSpawnData(Message.Create(MessageSendMode.reliable, ServerToClientId.spawnPlayer)));
         }
 
         private Message GetSpawnData(Message message)

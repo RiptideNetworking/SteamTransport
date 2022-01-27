@@ -31,6 +31,7 @@ namespace RiptideNetworking.Transports.SteamTransport
         /// <inheritdoc/>
         public IConnectionInfo[] Clients => clients.Values.ToArray();
         /// <inheritdoc/>
+        public bool AllowAutoMessageRelay { get; set; } = false;
 
         /// <summary>Currently connected clients, accessible by their endpoints or numeric ID.</summary>
         private DoubleKeyDictionary<ushort, CSteamID, SteamConnection> clients;
@@ -117,7 +118,7 @@ namespace RiptideNetworking.Transports.SteamTransport
             ushort id = GetAvailableClientId();
             SteamConnection steamConnection = new SteamConnection(this, steamId, id, connection);
             clients.Add(id, steamId, steamConnection);
-            OnClientConnected(steamConnection.SteamId, new ServerClientConnectedEventArgs(steamConnection));
+            OnClientConnected(steamConnection.SteamId, new ServerClientConnectedEventArgs(steamConnection, null));
         }
 
         /// <inheritdoc/>
@@ -144,6 +145,13 @@ namespace RiptideNetworking.Transports.SteamTransport
                             case HeaderType.unreliable:
                             case HeaderType.reliable:
                                 OnMessageReceived(new ServerMessageReceivedEventArgs(client.Id, message.GetUShort(), message));
+                                break;
+                            case HeaderType.unreliableAutoRelay:
+                            case HeaderType.reliableAutoRelay:
+                                if (AllowAutoMessageRelay)
+                                    SendToAll(message, client.Id, false);
+                                else
+                                    OnMessageReceived(new ServerMessageReceivedEventArgs(client.Id, message.GetUShort(), message));
                                 break;
 
                             case HeaderType.welcome:
@@ -278,7 +286,7 @@ namespace RiptideNetworking.Transports.SteamTransport
             if (clients.Count <= 1)
                 return; // We don't send this to the newly connected client anyways, so don't even bother creating a message if he is the only one connected
 
-            Message message = Message.Create(HeaderType.clientConnected);
+            Message message = MessageExtensionsTransports.Create(HeaderType.clientConnected);
             message.Add(id);
 
             foreach (SteamConnection client in clients.Values)
@@ -294,7 +302,7 @@ namespace RiptideNetworking.Transports.SteamTransport
         /// <param name="id">The numeric ID of the client that disconnected.</param>
         private void SendClientDisconnected(ushort id)
         {
-            Message message = Message.Create(HeaderType.clientDisconnected);
+            Message message = MessageExtensionsTransports.Create(HeaderType.clientDisconnected);
             message.Add(id);
 
             foreach (SteamConnection client in clients.Values)

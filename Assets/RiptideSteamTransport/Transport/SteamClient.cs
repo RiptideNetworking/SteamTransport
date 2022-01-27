@@ -63,8 +63,11 @@ namespace RiptideNetworking.Transports.SteamTransport
 
         /// <inheritdoc/>
         /// <remarks>Expects the host address to consist of a Steam ID (<see cref="ulong"/>).</remarks>
-        public void Connect(string hostAddress)
+        public void Connect(string hostAddress, Message message)
         {
+            if (message != null)
+                RiptideLogger.Log(LogType.error, $"The Steam transport does not support including custom data in connection attempts! Use the {nameof(Client.Connected)} event to send a message instead."); // TODO: maybe revisit this?
+
             try
             {
 #if UNITY_SERVER
@@ -283,7 +286,7 @@ namespace RiptideNetworking.Transports.SteamTransport
         /// <summary>Sends a welcome (received) message.</summary>
         private void SendWelcomeReceived()
         {
-            Message message = Message.Create(HeaderType.welcome);
+            Message message = MessageExtensionsTransports.Create(HeaderType.welcome);
             message.Add(Id);
 
             Send(message);
