@@ -56,7 +56,7 @@ namespace RiptideNetworking.Transports.SteamTransport
             {
                 Marshal.Copy(data.m_pData, message.Bytes, 0, data.m_cbSize);
                 messageHeader = (HeaderType)message.Bytes[0];
-                message.PrepareForUse(messageHeader, (ushort)message.Bytes.Length);
+                message.PrepareForUse(messageHeader, (ushort)data.m_cbSize);
             }
 
             SteamNetworkingMessage_t.Release(ptrs);
