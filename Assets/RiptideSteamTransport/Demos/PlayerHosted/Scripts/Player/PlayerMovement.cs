@@ -1,9 +1,4 @@
-
-// This file is provided under The MIT License as part of RiptideSteamTransport.
-// Copyright (c) 2021 Tom Weiland
-// For additional information please see the included LICENSE.md file or view it on GitHub: https://github.com/tom-weiland/RiptideSteamTransport/blob/main/LICENSE.md
-
-using RiptideNetworking;
+﻿using RiptideNetworking;
 using UnityEngine;
 
 namespace RiptideDemos.SteamTransport.PlayerHosted
