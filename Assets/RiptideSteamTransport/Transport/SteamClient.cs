@@ -14,7 +14,7 @@ namespace Riptide.Transports.Steam
     {
         public event EventHandler Connected;
         public event EventHandler ConnectionFailed;
-        public event EventHandler<ClientDisconnectedEventArgs> Disconnected;
+        public event EventHandler<DisconnectedEventArgs> Disconnected;
 
         private const string LocalHostName = "localhost";
         private const string LocalHostIP = "127.0.0.1";
@@ -87,7 +87,7 @@ namespace Riptide.Transports.Steam
 
             SteamNetworkingSockets.CreateSocketPair(out HSteamNetConnection connectionToClient, out HSteamNetConnection connectionToServer, false, ref clientIdentity, ref serverIdentity);
 
-            localServer.OnClientConnecting(new SteamConnection(playerSteamId, connectionToClient, this));
+            localServer.OnConnecting(new SteamConnection(playerSteamId, connectionToClient, this));
             OnConnected();
             return new SteamConnection(playerSteamId, connectionToServer, this);
         }
@@ -196,7 +196,7 @@ namespace Riptide.Transports.Steam
 
         protected virtual void OnDisconnected(DisconnectReason reason)
         {
-            Disconnected?.Invoke(this, new ClientDisconnectedEventArgs(steamConnection, reason));
+            Disconnected?.Invoke(this, new DisconnectedEventArgs(steamConnection, reason));
         }
     }
 }

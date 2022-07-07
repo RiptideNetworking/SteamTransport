@@ -12,9 +12,9 @@ namespace Riptide.Transports.Steam
 {
     public class SteamServer : SteamPeer, IServer
     {
-        public event EventHandler<ClientConnectingEventArgs> ClientConnecting;
-        public event EventHandler<ClientConnectedEventArgs> ClientConnected;
-        public event EventHandler<ClientDisconnectedEventArgs> ClientDisconnected;
+        public event EventHandler<ConnectingEventArgs> Connecting;
+        public event EventHandler<ConnectedEventArgs> Connected;
+        public event EventHandler<DisconnectedEventArgs> Disconnected;
 
         public ushort Port { get; private set; }
 
@@ -52,21 +52,21 @@ namespace Riptide.Transports.Steam
             switch (callback.m_info.m_eState)
             {
                 case ESteamNetworkingConnectionState.k_ESteamNetworkingConnectionState_Connecting:
-                    OnClientConnecting(new SteamConnection(clientSteamId, callback.m_hConn, this));
+                    OnConnecting(new SteamConnection(clientSteamId, callback.m_hConn, this));
                     break;
 
                 case ESteamNetworkingConnectionState.k_ESteamNetworkingConnectionState_Connected:
-                    OnClientConnected(connections[clientSteamId]);
+                    OnConnected(connections[clientSteamId]);
                     break;
 
                 case ESteamNetworkingConnectionState.k_ESteamNetworkingConnectionState_ClosedByPeer:
                     SteamNetworkingSockets.CloseConnection(callback.m_hConn, 0, "Closed by peer", false);
-                    OnClientDisconnected(clientSteamId, DisconnectReason.disconnected);
+                    OnDisconnected(clientSteamId, DisconnectReason.disconnected);
                     break;
 
                 case ESteamNetworkingConnectionState.k_ESteamNetworkingConnectionState_ProblemDetectedLocally:
                     SteamNetworkingSockets.CloseConnection(callback.m_hConn, 0, "Problem detected", false);
-                    OnClientDisconnected(clientSteamId, DisconnectReason.transportError);
+                    OnDisconnected(clientSteamId, DisconnectReason.transportError);
                     break;
 
                 default:
@@ -85,7 +85,7 @@ namespace Riptide.Transports.Steam
                     // When a SteamClient connects to a locally running server, Steam immediately places the connection in the connected
                     // state. Therefore, if the connection is already in the connected state at this point, we can assume that's what's
                     // happening and avoid accepting the connection "again". We just need to inform Riptide that we're fully connected.
-                    OnClientConnected(steamConnection);
+                    OnConnected(steamConnection);
                     return;
                 }
 
@@ -138,21 +138,21 @@ namespace Riptide.Transports.Steam
             SteamNetworkingSockets.CloseListenSocket(listenSocket);
         }
 
-        protected internal virtual void OnClientConnecting(SteamConnection connection)
+        protected internal virtual void OnConnecting(SteamConnection connection)
         {
-            ClientConnecting?.Invoke(this, new ClientConnectingEventArgs(connection));
+            Connecting?.Invoke(this, new ConnectingEventArgs(connection));
         }
 
-        protected virtual void OnClientConnected(Connection connection)
+        protected virtual void OnConnected(Connection connection)
         {
-            ClientConnected?.Invoke(this, new ClientConnectedEventArgs(connection));
+            Connected?.Invoke(this, new ConnectedEventArgs(connection));
         }
 
-        protected virtual void OnClientDisconnected(CSteamID steamId, DisconnectReason reason)
+        protected virtual void OnDisconnected(CSteamID steamId, DisconnectReason reason)
         {
             if (connections.TryGetValue(steamId, out SteamConnection connection))
             {
-                ClientDisconnected?.Invoke(this, new ClientDisconnectedEventArgs(connection, reason));
+                Disconnected?.Invoke(this, new DisconnectedEventArgs(connection, reason));
                 connections.Remove(steamId);
             }
         }
