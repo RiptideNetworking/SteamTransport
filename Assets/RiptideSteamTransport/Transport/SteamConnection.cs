@@ -4,11 +4,12 @@
 // https://github.com/tom-weiland/RiptideSteamTransport/blob/main/LICENSE.md
 
 using Steamworks;
+using System;
 using System.Collections.Generic;
 
 namespace Riptide.Transports.Steam
 {
-    public class SteamConnection : Connection
+    public class SteamConnection : Connection, IEquatable<SteamConnection>
     {
         public readonly CSteamID SteamId;
         public readonly HSteamNetConnection SteamNetConnection;
@@ -47,7 +48,7 @@ namespace Riptide.Transports.Steam
         /// <inheritdoc/>
         public override int GetHashCode()
         {
-            return -288961498 + EqualityComparer<HSteamNetConnection>.Default.GetHashCode(SteamNetConnection);
+            return -721414014 + EqualityComparer<HSteamNetConnection>.Default.GetHashCode(SteamNetConnection);
         }
 
         public static bool operator ==(SteamConnection left, SteamConnection right)
