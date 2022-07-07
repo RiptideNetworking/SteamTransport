@@ -141,11 +141,11 @@
       }
     },
     "net.tomweiland.riptidenetworking": {
-      "version": "https://github.com/tom-weiland/RiptideNetworking.git?path=/UnityPackage",
+      "version": "https://github.com/tom-weiland/RiptideNetworking.git?path=/Unity/Packages/Core#transport-rework",
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "b063398f96faa068534d3e1ea7591ae9a6f0080d"
+      "hash": "31a207b0af3694abf5623311b38ba1e236157ac4"
     },
     "com.unity.modules.ai": {
       "version": "1.0.0",

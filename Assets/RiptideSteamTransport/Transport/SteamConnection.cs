@@ -1,67 +1,69 @@
 ﻿// This file is provided under The MIT License as part of RiptideSteamTransport.
 // Copyright (c) Tom Weiland
-// For additional information please see the included LICENSE.md file or view it on GitHub: https://github.com/tom-weiland/RiptideSteamTransport/blob/main/LICENSE.md
+// For additional information please see the included LICENSE.md file or view it on GitHub:
+// https://github.com/tom-weiland/RiptideSteamTransport/blob/main/LICENSE.md
 
-using RiptideNetworking.Utils;
 using Steamworks;
+using System.Collections.Generic;
 
-namespace RiptideNetworking.Transports.SteamTransport
+namespace Riptide.Transports.Steam
 {
-    public class SteamConnection : IConnectionInfo
+    public class SteamConnection : Connection
     {
-        /// <inheritdoc/>
-        public ushort Id { get; private set; }
-        public CSteamID SteamId { get; private set; }
-        /// <inheritdoc/>
-        public short RTT => throw new System.NotImplementedException();
-        /// <inheritdoc/>
-        public short SmoothRTT => throw new System.NotImplementedException();
-        /// <inheritdoc/>
-        public bool IsNotConnected => connectionState == ConnectionState.notConnected;
-        /// <inheritdoc/>
-        public bool IsConnecting => connectionState == ConnectionState.connecting;
-        /// <inheritdoc/>
-        public bool IsConnected => connectionState == ConnectionState.connected;
-        
-        internal HSteamNetConnection SteamNetConnection { get; private set; }
+        public readonly CSteamID SteamId;
+        public readonly HSteamNetConnection SteamNetConnection;
 
-        private readonly SteamServer server;
-        private ConnectionState connectionState;
+        private readonly SteamPeer peer;
 
-        internal SteamConnection(SteamServer server, CSteamID steamId, ushort id, HSteamNetConnection steamNetConnection)
+        internal SteamConnection(CSteamID steamId, HSteamNetConnection steamNetConnection, SteamPeer peer)
         {
-            this.server = server;
             SteamId = steamId;
-            Id = id;
             SteamNetConnection = steamNetConnection;
-
-            connectionState = ConnectionState.connecting;
-            SendWelcome();
+            this.peer = peer;
         }
 
-        internal void Disconnect()
+        protected override void Send(byte[] dataBuffer, int amount)
         {
-            connectionState = ConnectionState.notConnected;
+            peer.Send(dataBuffer, amount, SteamNetConnection);
         }
 
-        #region Messages
-        /// <summary>Sends a welcome message.</summary>
-        internal void SendWelcome()
+        /// <inheritdoc/>
+        public override string ToString() => SteamNetConnection.ToString();
+
+        /// <inheritdoc/>
+        public override bool Equals(object obj) => Equals(obj as SteamConnection);
+        /// <inheritdoc/>
+        public bool Equals(SteamConnection other)
         {
-            Message message = MessageExtensionsTransports.Create(HeaderType.welcome);
-            message.Add(Id);
+            if (other is null)
+                return false;
 
-            server.Send(message, this);
+            if (ReferenceEquals(this, other))
+                return true;
+
+            return SteamNetConnection.Equals(other.SteamNetConnection);
         }
 
-        /// <summary>Handles a welcome message.</summary>
-        /// <param name="message">The welcome message to handle.</param>
-        internal void HandleWelcomeReceived(Message message)
+        /// <inheritdoc/>
+        public override int GetHashCode()
         {
-            ushort id = message.GetUShort();
-            if (Id != id)
-                RiptideLogger.Log(LogType.error, server.LogName, $"Client has assumed ID {id} instead of {Id}!");
+            return -288961498 + EqualityComparer<HSteamNetConnection>.Default.GetHashCode(SteamNetConnection);
         }
-        #endregion
+
+        public static bool operator ==(SteamConnection left, SteamConnection right)
+        {
+            if (left is null)
+            {
+                if (right is null)
+                    return true;
+
+                return false; // Only the left side is null
+            }
+
+            // Equals handles case of null on right side
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(SteamConnection left, SteamConnection right) => !(left == right);
     }
-};
+}

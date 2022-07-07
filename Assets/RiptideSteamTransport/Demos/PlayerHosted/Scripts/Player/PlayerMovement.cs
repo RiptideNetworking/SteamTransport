@@ -1,4 +1,4 @@
-﻿using RiptideNetworking;
+﻿using Riptide;
 using UnityEngine;
 
 namespace RiptideDemos.SteamTransport.PlayerHosted

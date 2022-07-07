@@ -1,6 +1,6 @@
-﻿using RiptideNetworking;
-using RiptideNetworking.Transports.SteamTransport;
-using RiptideNetworking.Utils;
+﻿using Riptide;
+using Riptide.Transports.Steam;
+using Riptide.Utils;
 using System;
 using UnityEngine;
 
