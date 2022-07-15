@@ -12,7 +12,6 @@ namespace Riptide.Transports.Steam
 {
     public class SteamServer : SteamPeer, IServer
     {
-        public event EventHandler<ConnectingEventArgs> Connecting;
         public event EventHandler<ConnectedEventArgs> Connected;
         public event EventHandler<DisconnectedEventArgs> Disconnected;
 
@@ -52,11 +51,11 @@ namespace Riptide.Transports.Steam
             switch (callback.m_info.m_eState)
             {
                 case ESteamNetworkingConnectionState.k_ESteamNetworkingConnectionState_Connecting:
-                    OnConnecting(new SteamConnection(clientSteamId, callback.m_hConn, this));
+                    Accept(callback.m_hConn);
                     break;
 
                 case ESteamNetworkingConnectionState.k_ESteamNetworkingConnectionState_Connected:
-                    OnConnected(connections[clientSteamId]);
+                    Add(new SteamConnection(clientSteamId, callback.m_hConn, this));
                     break;
 
                 case ESteamNetworkingConnectionState.k_ESteamNetworkingConnectionState_ClosedByPeer:
@@ -75,30 +74,22 @@ namespace Riptide.Transports.Steam
             }
         }
 
-        public void Accept(Connection connection)
+        internal void Add(SteamConnection connection)
         {
-            if (connection is SteamConnection steamConnection)
+            if (!connections.ContainsKey(connection.SteamId))
             {
-                connections[steamConnection.SteamId] = steamConnection;
-                if (SteamNetworkingSockets.GetQuickConnectionStatus(steamConnection.SteamNetConnection, out SteamNetworkingQuickConnectionStatus status) && status.m_eState == ESteamNetworkingConnectionState.k_ESteamNetworkingConnectionState_Connected)
-                {
-                    // When a SteamClient connects to a locally running server, Steam immediately places the connection in the connected
-                    // state. Therefore, if the connection is already in the connected state at this point, we can assume that's what's
-                    // happening and avoid accepting the connection "again". We just need to inform Riptide that we're fully connected.
-                    OnConnected(steamConnection);
-                    return;
-                }
-
-                EResult result = SteamNetworkingSockets.AcceptConnection(steamConnection.SteamNetConnection);
-                if (result != EResult.k_EResultOK)
-                    Debug.LogWarning($"{LogName}: Connection from {steamConnection.SteamId} could not be accepted: {result}");
+                connections.Add(connection.SteamId, connection);
+                OnConnected(connection);
             }
+            else
+                Debug.Log($"{LogName}: Connection from {connection.SteamId} could not be accepted: Already connected");
         }
 
-        public void Reject(Connection connection)
+        private void Accept(HSteamNetConnection connection)
         {
-            if (connection is SteamConnection steamConnection)
-                SteamNetworkingSockets.CloseConnection(steamConnection.SteamNetConnection, 0, "Server full", false);
+            EResult result = SteamNetworkingSockets.AcceptConnection(connection);
+            if (result != EResult.k_EResultOK)
+                Debug.LogWarning($"{LogName}: Connection could not be accepted: {result}");
         }
 
         public void Close(Connection connection)
@@ -138,12 +129,7 @@ namespace Riptide.Transports.Steam
             SteamNetworkingSockets.CloseListenSocket(listenSocket);
         }
 
-        protected internal virtual void OnConnecting(SteamConnection connection)
-        {
-            Connecting?.Invoke(this, new ConnectingEventArgs(connection));
-        }
-
-        protected virtual void OnConnected(Connection connection)
+        protected internal virtual void OnConnected(Connection connection)
         {
             Connected?.Invoke(this, new ConnectedEventArgs(connection));
         }

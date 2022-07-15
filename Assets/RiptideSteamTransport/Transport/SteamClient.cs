@@ -51,7 +51,7 @@ namespace Riptide.Transports.Steam
                 return false;
             }
 
-            connectError = $"Invalid host address '{hostAddress}'! Expected '{LocalHostIP}' or '{LocalHostName} for local connections, or a valid Steam ID.";
+            connectError = $"Invalid host address '{hostAddress}'! Expected '{LocalHostIP}' or '{LocalHostName}' for local connections, or a valid Steam ID.";
             if (hostAddress == LocalHostIP || hostAddress == LocalHostName)
             {
                 if (localServer == null)
@@ -87,7 +87,7 @@ namespace Riptide.Transports.Steam
 
             SteamNetworkingSockets.CreateSocketPair(out HSteamNetConnection connectionToClient, out HSteamNetConnection connectionToServer, false, ref clientIdentity, ref serverIdentity);
 
-            localServer.OnConnecting(new SteamConnection(playerSteamId, connectionToClient, this));
+            localServer.Add(new SteamConnection(playerSteamId, connectionToClient, this));
             OnConnected();
             return new SteamConnection(playerSteamId, connectionToServer, this);
         }
@@ -115,14 +115,13 @@ namespace Riptide.Transports.Steam
             }
         }
 
-        private async void ConnectTimeout() // TODO: confirm if this needed, Riptide *should* take care of timing out the connection
+        private async void ConnectTimeout() // TODO: confirm if this is needed, Riptide *should* take care of timing out the connection
         {
             Task timeOutTask = Task.Delay(6000); // TODO: use Riptide Client's TimeoutTime
             await Task.WhenAny(timeOutTask);
 
             if (!steamConnection.IsConnected)
-                Debug.LogError($"{LogName}: Still not connected, and transport can't trigger a connection failed event!");
-            //OnConnectionFailed();
+                OnConnectionFailed();
         }
 
         private void OnConnectionStatusChanged(SteamNetConnectionStatusChangedCallback_t callback)
