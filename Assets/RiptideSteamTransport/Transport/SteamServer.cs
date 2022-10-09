@@ -60,12 +60,12 @@ namespace Riptide.Transports.Steam
 
                 case ESteamNetworkingConnectionState.k_ESteamNetworkingConnectionState_ClosedByPeer:
                     SteamNetworkingSockets.CloseConnection(callback.m_hConn, 0, "Closed by peer", false);
-                    OnDisconnected(clientSteamId, DisconnectReason.disconnected);
+                    OnDisconnected(clientSteamId, DisconnectReason.Disconnected);
                     break;
 
                 case ESteamNetworkingConnectionState.k_ESteamNetworkingConnectionState_ProblemDetectedLocally:
                     SteamNetworkingSockets.CloseConnection(callback.m_hConn, 0, "Problem detected", false);
-                    OnDisconnected(clientSteamId, DisconnectReason.transportError);
+                    OnDisconnected(clientSteamId, DisconnectReason.TransportError);
                     break;
 
                 default:
@@ -101,7 +101,7 @@ namespace Riptide.Transports.Steam
             }
         }
 
-        public void Tick()
+        public void Poll()
         {
             foreach (SteamConnection connection in connections.Values)
                 Receive(connection);

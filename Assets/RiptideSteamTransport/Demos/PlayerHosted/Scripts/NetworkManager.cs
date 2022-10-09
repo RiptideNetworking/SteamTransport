@@ -1,20 +1,19 @@
-﻿using Riptide;
-using Riptide.Transports.Steam;
+﻿using Riptide.Transports.Steam;
 using Riptide.Utils;
 using System;
 using UnityEngine;
 
-namespace RiptideDemos.SteamTransport.PlayerHosted
+namespace Riptide.Demos.Steam.PlayerHosted
 {
     public enum ServerToClientId : ushort
     {
-        spawnPlayer = 1,
-        playerMovement,
+        SpawnPlayer = 1,
+        PlayerMovement,
     }
     public enum ClientToServerId : ushort
     {
-        playerName = 1,
-        playerInput,
+        PlayerName = 1,
+        PlayerInput,
     }
 
     public class NetworkManager : MonoBehaviour
@@ -82,9 +81,9 @@ namespace RiptideDemos.SteamTransport.PlayerHosted
         private void FixedUpdate()
         {
             if (Server.IsRunning)
-                Server.Tick();
+                Server.Update();
 
-            Client.Tick();
+            Client.Update();
         }
 
         private void OnApplicationQuit()
@@ -114,7 +113,7 @@ namespace RiptideDemos.SteamTransport.PlayerHosted
                 Destroy(player.gameObject);
         }
 
-        private void NewPlayerConnected(object sender, ServerClientConnectedEventArgs e)
+        private void NewPlayerConnected(object sender, ServerConnectedEventArgs e)
         {
             foreach (ServerPlayer player in ServerPlayer.List.Values)
             {
@@ -123,15 +122,15 @@ namespace RiptideDemos.SteamTransport.PlayerHosted
             }
         }
 
-        private void ServerPlayerLeft(object sender, ClientDisconnectedEventArgs e)
+        private void ServerPlayerLeft(object sender, ServerDisconnectedEventArgs e)
         {
-            Destroy(ServerPlayer.List[e.Id].gameObject);
+            Destroy(ServerPlayer.List[e.Client.Id].gameObject);
         }
 
         private void DidConnect(object sender, EventArgs e)
         {
-            Message message = Message.Create(MessageSendMode.reliable, ClientToServerId.playerName);
-            message.Add(Steamworks.SteamFriends.GetPersonaName());
+            Message message = Message.Create(MessageSendMode.Reliable, ClientToServerId.PlayerName);
+            message.AddString(Steamworks.SteamFriends.GetPersonaName());
             Client.Send(message);
         }
 

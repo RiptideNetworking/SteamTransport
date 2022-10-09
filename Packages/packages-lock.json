@@ -140,12 +140,12 @@
         "com.unity.modules.imgui": "1.0.0"
       }
     },
-    "net.tomweiland.riptidenetworking": {
-      "version": "https://github.com/tom-weiland/RiptideNetworking.git?path=/Unity/Packages/Core",
+    "net.tomweiland.riptide": {
+      "version": "https://github.com/RiptideNetworking/Riptide.git?path=/Packages/Core#2.0.0",
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "e36b11a76b55ef4f48b6dc444ace6277d4400522"
+      "hash": "bb252ba2ea4bd1314d3f8f60bea490418635d06e"
     },
     "com.unity.modules.ai": {
       "version": "1.0.0",

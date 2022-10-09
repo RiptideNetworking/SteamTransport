@@ -1,7 +1,6 @@
-﻿using Riptide;
-using UnityEngine;
+﻿using UnityEngine;
 
-namespace RiptideDemos.SteamTransport.PlayerHosted
+namespace Riptide.Demos.Steam.PlayerHosted
 {
     [RequireComponent(typeof(CharacterController))]
     public class PlayerMovement : MonoBehaviour
@@ -73,10 +72,10 @@ namespace RiptideDemos.SteamTransport.PlayerHosted
         #region Messages
         private void SendMovement()
         {
-            Message message = Message.Create(MessageSendMode.unreliable, ServerToClientId.playerMovement);
-            message.Add(player.Id);
-            message.Add(transform.position);
-            message.Add(transform.forward);
+            Message message = Message.Create(MessageSendMode.Unreliable, ServerToClientId.PlayerMovement);
+            message.AddUShort(player.Id);
+            message.AddVector3(transform.position);
+            message.AddVector3(transform.forward);
             NetworkManager.Singleton.Server.SendToAll(message);
         }
         #endregion

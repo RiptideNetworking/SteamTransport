@@ -1,8 +1,7 @@
-﻿using Riptide;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace RiptideDemos.SteamTransport.PlayerHosted
+namespace Riptide.Demos.Steam.PlayerHosted
 {
     public class ClientPlayer : MonoBehaviour
     {
@@ -42,13 +41,13 @@ namespace RiptideDemos.SteamTransport.PlayerHosted
         }
 
         #region Messages
-        [MessageHandler((ushort)ServerToClientId.spawnPlayer, NetworkManager.PlayerHostedDemoMessageHandlerGroupId)]
+        [MessageHandler((ushort)ServerToClientId.SpawnPlayer, NetworkManager.PlayerHostedDemoMessageHandlerGroupId)]
         private static void SpawnPlayer(Message message)
         {
             Spawn(message.GetUShort(), message.GetString(), message.GetVector3());
         }
 
-        [MessageHandler((ushort)ServerToClientId.playerMovement, NetworkManager.PlayerHostedDemoMessageHandlerGroupId)]
+        [MessageHandler((ushort)ServerToClientId.PlayerMovement, NetworkManager.PlayerHostedDemoMessageHandlerGroupId)]
         private static void PlayerMovement(Message message)
         {
             ushort playerId = message.GetUShort();

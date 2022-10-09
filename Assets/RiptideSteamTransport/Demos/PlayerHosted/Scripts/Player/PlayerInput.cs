@@ -1,7 +1,6 @@
-﻿using Riptide;
-using UnityEngine;
+﻿using UnityEngine;
 
-namespace RiptideDemos.SteamTransport.PlayerHosted
+namespace Riptide.Demos.Steam.PlayerHosted
 {
     public class PlayerInput : MonoBehaviour
     {
@@ -44,9 +43,9 @@ namespace RiptideDemos.SteamTransport.PlayerHosted
         #region Messages
         private void SendInput()
         {
-            Message message = Message.Create(MessageSendMode.unreliable, ClientToServerId.playerInput);
-            message.Add(inputs, false);
-            message.Add(camTransform.forward);
+            Message message = Message.Create(MessageSendMode.Unreliable, ClientToServerId.PlayerInput);
+            message.AddBools(inputs, false);
+            message.AddVector3(camTransform.forward);
             NetworkManager.Singleton.Client.Send(message);
         }
         #endregion

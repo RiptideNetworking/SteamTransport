@@ -1,7 +1,7 @@
 ﻿using Steamworks;
 using UnityEngine;
 
-namespace RiptideDemos.SteamTransport.PlayerHosted
+namespace Riptide.Demos.Steam.PlayerHosted
 {
     public class LobbyManager : MonoBehaviour
     {

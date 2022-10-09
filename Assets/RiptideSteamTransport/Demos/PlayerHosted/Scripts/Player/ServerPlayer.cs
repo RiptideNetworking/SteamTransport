@@ -1,8 +1,7 @@
-﻿using Riptide;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace RiptideDemos.SteamTransport.PlayerHosted
+namespace Riptide.Demos.Steam.PlayerHosted
 {
     [RequireComponent(typeof(PlayerMovement))]
     public class ServerPlayer : MonoBehaviour
@@ -47,29 +46,29 @@ namespace RiptideDemos.SteamTransport.PlayerHosted
         /// <param name="toClient">The client to send the message to.</param>
         public void SendSpawn(ushort toClient)
         {
-            NetworkManager.Singleton.Server.Send(GetSpawnData(Message.Create(MessageSendMode.reliable, ServerToClientId.spawnPlayer)), toClient);
+            NetworkManager.Singleton.Server.Send(GetSpawnData(Message.Create(MessageSendMode.Reliable, ServerToClientId.SpawnPlayer)), toClient);
         }
         /// <summary>Sends a player's info to all clients.</summary>
         private void SendSpawn()
         {
-            NetworkManager.Singleton.Server.SendToAll(GetSpawnData(Message.Create(MessageSendMode.reliable, ServerToClientId.spawnPlayer)));
+            NetworkManager.Singleton.Server.SendToAll(GetSpawnData(Message.Create(MessageSendMode.Reliable, ServerToClientId.SpawnPlayer)));
         }
 
         private Message GetSpawnData(Message message)
         {
-            message.Add(Id);
-            message.Add(Username);
-            message.Add(transform.position);
+            message.AddUShort(Id);
+            message.AddString(Username);
+            message.AddVector3(transform.position);
             return message;
         }
 
-        [MessageHandler((ushort)ClientToServerId.playerName, NetworkManager.PlayerHostedDemoMessageHandlerGroupId)]
+        [MessageHandler((ushort)ClientToServerId.PlayerName, NetworkManager.PlayerHostedDemoMessageHandlerGroupId)]
         private static void PlayerName(ushort fromClientId, Message message)
         {
             Spawn(fromClientId, message.GetString());
         }
 
-        [MessageHandler((ushort)ClientToServerId.playerInput, NetworkManager.PlayerHostedDemoMessageHandlerGroupId)]
+        [MessageHandler((ushort)ClientToServerId.PlayerInput, NetworkManager.PlayerHostedDemoMessageHandlerGroupId)]
         private static void PlayerInput(ushort fromClientId, Message message)
         {
             ServerPlayer player = List[fromClientId];

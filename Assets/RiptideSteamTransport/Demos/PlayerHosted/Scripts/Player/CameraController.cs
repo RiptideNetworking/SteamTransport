@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace RiptideDemos.SteamTransport.PlayerHosted
+namespace Riptide.Demos.Steam.PlayerHosted
 {
     public class CameraController : MonoBehaviour
     {
