@@ -13,6 +13,7 @@ namespace Riptide.Transports.Steam
     public class SteamServer : SteamPeer, IServer
     {
         public event EventHandler<ConnectedEventArgs> Connected;
+        public event EventHandler<DataReceivedEventArgs> DataReceived;
         public event EventHandler<DisconnectedEventArgs> Disconnected;
 
         public ushort Port { get; private set; }
@@ -132,6 +133,19 @@ namespace Riptide.Transports.Steam
         protected internal virtual void OnConnected(Connection connection)
         {
             Connected?.Invoke(this, new ConnectedEventArgs(connection));
+        }
+
+        protected override void OnDataReceived(byte[] dataBuffer, int amount, SteamConnection fromConnection)
+        {
+            if ((MessageHeader)dataBuffer[0] == MessageHeader.Connect)
+            {
+                if (fromConnection.DidReceiveConnect)
+                    return;
+
+                fromConnection.DidReceiveConnect = true;
+            }
+
+            DataReceived?.Invoke(this, new DataReceivedEventArgs(dataBuffer, amount, fromConnection));
         }
 
         protected virtual void OnDisconnected(CSteamID steamId, DisconnectReason reason)

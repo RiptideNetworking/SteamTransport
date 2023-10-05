@@ -14,6 +14,8 @@ namespace Riptide.Transports.Steam
         public readonly CSteamID SteamId;
         public readonly HSteamNetConnection SteamNetConnection;
 
+        internal bool DidReceiveConnect;
+
         private readonly SteamPeer peer;
 
         internal SteamConnection(CSteamID steamId, HSteamNetConnection steamNetConnection, SteamPeer peer)

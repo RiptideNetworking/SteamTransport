@@ -14,6 +14,7 @@ namespace Riptide.Transports.Steam
     {
         public event EventHandler Connected;
         public event EventHandler ConnectionFailed;
+        public event EventHandler<DataReceivedEventArgs> DataReceived;
         public event EventHandler<DisconnectedEventArgs> Disconnected;
 
         private const string LocalHostName = "localhost";
@@ -191,6 +192,11 @@ namespace Riptide.Transports.Steam
         protected virtual void OnConnectionFailed()
         {
             ConnectionFailed?.Invoke(this, EventArgs.Empty);
+        }
+
+        protected override void OnDataReceived(byte[] dataBuffer, int amount, SteamConnection fromConnection)
+        {
+            DataReceived?.Invoke(this, new DataReceivedEventArgs(dataBuffer, amount, fromConnection));
         }
 
         protected virtual void OnDisconnected(DisconnectReason reason)

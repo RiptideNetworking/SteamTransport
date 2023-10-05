@@ -10,12 +10,10 @@ using UnityEngine;
 
 namespace Riptide.Transports.Steam
 {
-    public class SteamPeer
+    public abstract class SteamPeer
     {
-        /// <summary>The name to use when logging messages via <see cref="RiptideLogger"/>.</summary>
+        /// <summary>The name to use when logging messages via <see cref="Utils.RiptideLogger"/>.</summary>
         public const string LogName = "STEAM";
-
-        public event EventHandler<DataReceivedEventArgs> DataReceived;
 
         protected const int MaxMessages = 256;
 
@@ -66,9 +64,6 @@ namespace Riptide.Transports.Steam
             handle.Free();
         }
 
-        protected virtual void OnDataReceived(byte[] dataBuffer, int amount, SteamConnection fromConnection)
-        {
-            DataReceived?.Invoke(this, new DataReceivedEventArgs(dataBuffer, amount, fromConnection));
-        }
+        protected abstract void OnDataReceived(byte[] dataBuffer, int amount, SteamConnection fromConnection);
     }
 }
