@@ -60,7 +60,6 @@ namespace Riptide.Demos.Steam.PlayerHosted
             }
 
             lobbyId = new CSteamID(callback.m_ulSteamIDLobby);
-            SteamMatchmaking.SetLobbyData(lobbyId, HostAddressKey, SteamUser.GetSteamID().ToString());
             UIManager.Singleton.LobbyCreationSucceeded(callback.m_ulSteamIDLobby);
 
             NetworkManager.Singleton.Server.Start(0, 5, NetworkManager.PlayerHostedDemoMessageHandlerGroupId);
@@ -83,9 +82,9 @@ namespace Riptide.Demos.Steam.PlayerHosted
                 return;
 
             lobbyId = new CSteamID(callback.m_ulSteamIDLobby);
-            string hostAddress = SteamMatchmaking.GetLobbyData(lobbyId, HostAddressKey);
+            CSteamID hostId = SteamMatchmaking.GetLobbyOwner(lobbyId);
 
-            NetworkManager.Singleton.Client.Connect(hostAddress, messageHandlerGroupId: NetworkManager.PlayerHostedDemoMessageHandlerGroupId);
+            NetworkManager.Singleton.Client.Connect(hostId.ToString(), messageHandlerGroupId: NetworkManager.PlayerHostedDemoMessageHandlerGroupId);
             UIManager.Singleton.LobbyEntered();
         }
 
