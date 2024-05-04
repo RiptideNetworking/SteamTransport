@@ -37,6 +37,7 @@ namespace Riptide.Transports.Steam
         public bool Connect(string hostAddress, out Connection connection, out string connectError)
         {
             connection = null;
+            int port = 0;
 
             try
             {
@@ -50,6 +51,12 @@ namespace Riptide.Transports.Steam
             {
                 connectError = $"Couldn't connect: {ex}";
                 return false;
+            }
+
+            if (TrySplitHostAddress(hostAddress, out string _hostAddress, out int _port))
+            {
+                hostAddress = _hostAddress;
+                port = _port;
             }
 
             connectError = $"Invalid host address '{hostAddress}'! Expected '{LocalHostIP}' or '{LocalHostName}' for local connections, or a valid Steam ID.";
@@ -67,7 +74,7 @@ namespace Riptide.Transports.Steam
             }
             else if (ulong.TryParse(hostAddress, out ulong hostId))
             {
-                connection = steamConnection = TryConnect(new CSteamID(hostId));
+                connection = steamConnection = TryConnect(new CSteamID(hostId), port);
                 return connection != null;
             }
 
@@ -93,7 +100,7 @@ namespace Riptide.Transports.Steam
             return new SteamConnection(playerSteamId, connectionToServer, this);
         }
 
-        private SteamConnection TryConnect(CSteamID hostId)
+        private SteamConnection TryConnect(CSteamID hostId, int port)
         {
             try
             {
@@ -103,7 +110,7 @@ namespace Riptide.Transports.Steam
                 serverIdentity.SetSteamID(hostId);
 
                 SteamNetworkingConfigValue_t[] options = new SteamNetworkingConfigValue_t[] { };
-                HSteamNetConnection connectionToServer = SteamNetworkingSockets.ConnectP2P(ref serverIdentity, 0, options.Length, options);
+                HSteamNetConnection connectionToServer = SteamNetworkingSockets.ConnectP2P(ref serverIdentity, port, options.Length, options);
 
                 ConnectTimeout();
                 return new SteamConnection(hostId, connectionToServer, this);
@@ -123,6 +130,20 @@ namespace Riptide.Transports.Steam
 
             if (!steamConnection.IsConnected)
                 OnConnectionFailed();
+        }
+
+        private static bool TrySplitHostAddress(string hostAddress, out string address, out int port)
+        {
+            int colonIndex = hostAddress.IndexOf(':');
+            if (colonIndex == -1)
+            {
+                address = default;
+                port = default;
+                return false;
+            }
+
+            address = hostAddress[..colonIndex];
+            return int.TryParse(hostAddress[(colonIndex + 1)..], out port);
         }
 
         private void OnConnectionStatusChanged(SteamNetConnectionStatusChangedCallback_t callback)
