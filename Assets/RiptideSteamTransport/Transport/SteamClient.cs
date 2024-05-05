@@ -53,16 +53,15 @@ namespace Riptide.Transports.Steam
                 return false;
             }
 
-
-            int colonIndex = hostAddress.IndexOf(':');
-            if (colonIndex != -1)
+            int portSeperatorIndex = hostAddress.IndexOf(':');
+            if (portSeperatorIndex != -1)
             {
-                if (!int.TryParse(hostAddress[(colonIndex + 1)..], out port))
+                if (!int.TryParse(hostAddress[(portSeperatorIndex + 1)..], out port))
                 {
-                    connectError = $"Couldn't connect: Failed to parse port '{hostAddress[(colonIndex + 1)..]}'";
+                    connectError = $"Couldn't connect: Failed to parse port '{hostAddress[(portSeperatorIndex + 1)..]}'";
                     return false;
                 }
-                hostAddress = hostAddress[..colonIndex];
+                hostAddress = hostAddress[..portSeperatorIndex];
             }
 
             connectError = $"Invalid host address '{hostAddress}'! Expected '{LocalHostIP}' or '{LocalHostName}' for local connections, or a valid Steam ID.";
