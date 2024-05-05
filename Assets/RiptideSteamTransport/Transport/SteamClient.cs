@@ -55,9 +55,13 @@ namespace Riptide.Transports.Steam
 
 
             int colonIndex = hostAddress.IndexOf(':');
-            if (colonIndex != -1
-                && int.TryParse(hostAddress[(colonIndex + 1)..], out port))
+            if (colonIndex != -1)
             {
+                if (!int.TryParse(hostAddress[(colonIndex + 1)..], out port))
+                {
+                    connectError = $"Couldn't connect: Failed to parse port '{hostAddress[(colonIndex + 1)..]}'";
+                    return false;
+                }
                 hostAddress = hostAddress[..colonIndex];
             }
 
