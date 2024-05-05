@@ -53,17 +53,6 @@ namespace Riptide.Transports.Steam
                 return false;
             }
 
-            int portSeperatorIndex = hostAddress.IndexOf(':');
-            if (portSeperatorIndex != -1)
-            {
-                if (!int.TryParse(hostAddress[(portSeperatorIndex + 1)..], out port))
-                {
-                    connectError = $"Couldn't connect: Failed to parse port '{hostAddress[(portSeperatorIndex + 1)..]}'";
-                    return false;
-                }
-                hostAddress = hostAddress[..portSeperatorIndex];
-            }
-
             connectError = $"Invalid host address '{hostAddress}'! Expected '{LocalHostIP}' or '{LocalHostName}' for local connections, or a valid Steam ID.";
             if (hostAddress == LocalHostIP || hostAddress == LocalHostName)
             {
@@ -77,7 +66,19 @@ namespace Riptide.Transports.Steam
                 connection = steamConnection = ConnectLocal();
                 return true;
             }
-            else if (ulong.TryParse(hostAddress, out ulong hostId))
+
+            int portSeperatorIndex = hostAddress.IndexOf(':');
+            if (portSeperatorIndex != -1)
+            {
+                if (!int.TryParse(hostAddress[(portSeperatorIndex + 1)..], out port))
+                {
+                    connectError = $"Couldn't connect: Failed to parse port '{hostAddress[(portSeperatorIndex + 1)..]}'";
+                    return false;
+                }
+                hostAddress = hostAddress[..portSeperatorIndex];
+            }
+
+            if (ulong.TryParse(hostAddress, out ulong hostId))
             {
                 connection = steamConnection = TryConnect(new CSteamID(hostId), port);
                 return connection != null;
