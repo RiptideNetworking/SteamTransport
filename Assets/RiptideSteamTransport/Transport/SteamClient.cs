@@ -53,10 +53,12 @@ namespace Riptide.Transports.Steam
                 return false;
             }
 
-            if (TrySplitHostAddress(hostAddress, out string _hostAddress, out int _port))
+
+            int colonIndex = hostAddress.IndexOf(':');
+            if (colonIndex != -1
+                && int.TryParse(hostAddress[(colonIndex + 1)..], out port))
             {
-                hostAddress = _hostAddress;
-                port = _port;
+                hostAddress = hostAddress[..colonIndex];
             }
 
             connectError = $"Invalid host address '{hostAddress}'! Expected '{LocalHostIP}' or '{LocalHostName}' for local connections, or a valid Steam ID.";
@@ -130,20 +132,6 @@ namespace Riptide.Transports.Steam
 
             if (!steamConnection.IsConnected)
                 OnConnectionFailed();
-        }
-
-        private static bool TrySplitHostAddress(string hostAddress, out string address, out int port)
-        {
-            int colonIndex = hostAddress.IndexOf(':');
-            if (colonIndex == -1)
-            {
-                address = default;
-                port = default;
-                return false;
-            }
-
-            address = hostAddress[..colonIndex];
-            return int.TryParse(hostAddress[(colonIndex + 1)..], out port);
         }
 
         private void OnConnectionStatusChanged(SteamNetConnectionStatusChangedCallback_t callback)
