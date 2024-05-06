@@ -48,6 +48,8 @@ namespace Riptide.Transports.Steam
                         Marshal.Copy(data.m_pData, receiveBuffer, 0, data.m_cbSize);
                         OnDataReceived(receiveBuffer, byteCount, fromConnection);
                     }
+
+                    SteamNetworkingMessage_t.Release(ptrs[i]);
                 }
             }
         }
