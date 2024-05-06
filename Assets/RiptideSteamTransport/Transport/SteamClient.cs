@@ -37,6 +37,7 @@ namespace Riptide.Transports.Steam
         public bool Connect(string hostAddress, out Connection connection, out string connectError)
         {
             connection = null;
+            int port = 0;
 
             try
             {
@@ -65,9 +66,21 @@ namespace Riptide.Transports.Steam
                 connection = steamConnection = ConnectLocal();
                 return true;
             }
-            else if (ulong.TryParse(hostAddress, out ulong hostId))
+
+            int portSeperatorIndex = hostAddress.IndexOf(':');
+            if (portSeperatorIndex != -1)
             {
-                connection = steamConnection = TryConnect(new CSteamID(hostId));
+                if (!int.TryParse(hostAddress[(portSeperatorIndex + 1)..], out port))
+                {
+                    connectError = $"Couldn't connect: Failed to parse port '{hostAddress[(portSeperatorIndex + 1)..]}'";
+                    return false;
+                }
+                hostAddress = hostAddress[..portSeperatorIndex];
+            }
+
+            if (ulong.TryParse(hostAddress, out ulong hostId))
+            {
+                connection = steamConnection = TryConnect(new CSteamID(hostId), port);
                 return connection != null;
             }
 
@@ -93,7 +106,7 @@ namespace Riptide.Transports.Steam
             return new SteamConnection(playerSteamId, connectionToServer, this);
         }
 
-        private SteamConnection TryConnect(CSteamID hostId)
+        private SteamConnection TryConnect(CSteamID hostId, int port)
         {
             try
             {
@@ -103,7 +116,7 @@ namespace Riptide.Transports.Steam
                 serverIdentity.SetSteamID(hostId);
 
                 SteamNetworkingConfigValue_t[] options = new SteamNetworkingConfigValue_t[] { };
-                HSteamNetConnection connectionToServer = SteamNetworkingSockets.ConnectP2P(ref serverIdentity, 0, options.Length, options);
+                HSteamNetConnection connectionToServer = SteamNetworkingSockets.ConnectP2P(ref serverIdentity, port, options.Length, options);
 
                 ConnectTimeout();
                 return new SteamConnection(hostId, connectionToServer, this);
